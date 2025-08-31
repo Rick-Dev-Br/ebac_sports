@@ -10,8 +10,7 @@ import { fetchProdutos } from './store/slices/produtosSlice'
 import {
   selectProdutos,
   selectProdutosLoading,
-  selectFavoritos,
-  selectCarrinho
+  selectFavoritos
 } from './store/selectors'
 import { adicionarAoCarrinho } from './store/slices/carrinhoSlice'
 import { toggleFavorito } from './store/slices/favoritosSlice'
@@ -22,7 +21,6 @@ function AppContent() {
   const produtos = useAppSelector(selectProdutos)
   const loading = useAppSelector(selectProdutosLoading)
   const favoritos = useAppSelector(selectFavoritos)
-  const carrinho = useAppSelector(selectCarrinho)
 
   useEffect(() => {
     dispatch(fetchProdutos())

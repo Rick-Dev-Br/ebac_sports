@@ -1,8 +1,5 @@
 // src/components/Produto/index.tsx
 import * as S from './styles'
-import { useDispatch } from 'react-redux'
-import { toggleFavorito } from '../../store/slices/favoritosSlice'
-import { adicionarAoCarrinho } from '../../store/slices/carrinhoSlice'
 import { Produto as ProdutoType } from '../../types'
 
 // Adicionar interface para as props
@@ -27,8 +24,6 @@ const ProdutoComponent = ({
   favoritar,
   aoComprar
 }: Props) => {
-  const dispatch = useDispatch()
-
   const handleFavoritar = (produto: ProdutoType) => {
     favoritar(produto)
   }
