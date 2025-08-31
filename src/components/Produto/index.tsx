@@ -1,24 +1,42 @@
-import { Produto as ProdutoType } from '../../App'
+// src/components/Produto/index.tsx
 import * as S from './styles'
+import { useDispatch } from 'react-redux'
+import { toggleFavorito } from '../../store/slices/favoritosSlice'
+import { adicionarAoCarrinho } from '../../store/slices/carrinhoSlice'
+import { Produto as ProdutoType } from '../../types'
 
-type Props = {
+// Adicionar interface para as props
+interface Props {
   produto: ProdutoType
-  aoComprar: (produto: ProdutoType) => void
-  favoritar: (produto: ProdutoType) => void
   estaNosFavoritos: boolean
+  favoritar: (produto: ProdutoType) => void
+  aoComprar: (produto: ProdutoType) => void
 }
 
-export const paraReal = (valor: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-    valor
-  )
+// Corrigir nome da função para paraReal
+const paraReal = (valor: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(valor)
+}
 
 const ProdutoComponent = ({
   produto,
-  aoComprar,
+  estaNosFavoritos,
   favoritar,
-  estaNosFavoritos
+  aoComprar
 }: Props) => {
+  const dispatch = useDispatch()
+
+  const handleFavoritar = (produto: ProdutoType) => {
+    favoritar(produto)
+  }
+
+  const handleAdicionarAoCarrinho = (produto: ProdutoType) => {
+    aoComprar(produto)
+  }
+
   return (
     <S.Produto>
       <S.Capa>
@@ -28,12 +46,15 @@ const ProdutoComponent = ({
       <S.Prices>
         <strong>{paraReal(produto.preco)}</strong>
       </S.Prices>
-      <S.BtnComprar onClick={() => favoritar(produto)} type="button">
+      <S.BtnComprar onClick={() => handleFavoritar(produto)} type="button">
         {estaNosFavoritos
           ? '- Remover dos favoritos'
           : '+ Adicionar aos favoritos'}
       </S.BtnComprar>
-      <S.BtnComprar onClick={() => aoComprar(produto)} type="button">
+      <S.BtnComprar
+        onClick={() => handleAdicionarAoCarrinho(produto)}
+        type="button"
+      >
         Adicionar ao carrinho
       </S.BtnComprar>
     </S.Produto>

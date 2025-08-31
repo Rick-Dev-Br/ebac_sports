@@ -1,57 +1,66 @@
-import { useEffect, useState } from 'react'
+// src/App.tsx
+import { useEffect } from 'react'
+import { Provider } from 'react-redux'
+import { store } from './store'
 import Header from './components/Header'
 import Produtos from './containers/Produtos'
-
 import { GlobalStyle } from './styles'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import { fetchProdutos } from './store/slices/produtosSlice'
+import {
+  selectProdutos,
+  selectProdutosLoading,
+  selectFavoritos,
+  selectCarrinho
+} from './store/selectors'
+import { adicionarAoCarrinho } from './store/slices/carrinhoSlice'
+import { toggleFavorito } from './store/slices/favoritosSlice'
+import { Produto } from './types'
 
-export type Produto = {
-  id: number
-  nome: string
-  preco: number
-  imagem: string
-}
-
-function App() {
-  const [produtos, setProdutos] = useState<Produto[]>([])
-  const [carrinho, setCarrinho] = useState<Produto[]>([])
-  const [favoritos, setFavoritos] = useState<Produto[]>([])
+function AppContent() {
+  const dispatch = useAppDispatch()
+  const produtos = useAppSelector(selectProdutos)
+  const loading = useAppSelector(selectProdutosLoading)
+  const favoritos = useAppSelector(selectFavoritos)
+  const carrinho = useAppSelector(selectCarrinho)
 
   useEffect(() => {
-    fetch('https://ebac-fake-api.vercel.app/api/ebac_sports')
-      .then((res) => res.json())
-      .then((res) => setProdutos(res))
-  }, [])
+    dispatch(fetchProdutos())
+  }, [dispatch])
 
-  function adicionarAoCarrinho(produto: Produto) {
-    if (carrinho.find((p) => p.id === produto.id)) {
-      alert('Item já adicionado')
-    } else {
-      setCarrinho([...carrinho, produto])
-    }
+  const handleAdicionarAoCarrinho = (produto: Produto) => {
+    dispatch(adicionarAoCarrinho(produto))
   }
 
-  function favoritar(produto: Produto) {
-    if (favoritos.find((p) => p.id === produto.id)) {
-      const favoritosSemProduto = favoritos.filter((p) => p.id !== produto.id)
-      setFavoritos(favoritosSemProduto)
-    } else {
-      setFavoritos([...favoritos, produto])
-    }
+  const handleFavoritar = (produto: Produto) => {
+    dispatch(toggleFavorito(produto))
+  }
+
+  if (loading) {
+    return <div>Carregando...</div>
   }
 
   return (
     <>
       <GlobalStyle />
       <div className="container">
-        <Header favoritos={favoritos} itensNoCarrinho={carrinho} />
+        <Header />
         <Produtos
           produtos={produtos}
           favoritos={favoritos}
-          favoritar={favoritar}
-          adicionarAoCarrinho={adicionarAoCarrinho}
+          adicionarAoCarrinho={handleAdicionarAoCarrinho}
+          favoritar={handleFavoritar}
         />
       </div>
     </>
+  )
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   )
 }
 
