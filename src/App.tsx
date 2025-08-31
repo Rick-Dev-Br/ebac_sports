@@ -1,30 +1,19 @@
-// src/App.tsx
-import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { store } from './store'
 import Header from './components/Header'
 import Produtos from './containers/Produtos'
 import { GlobalStyle } from './styles'
-import { useAppDispatch, useAppSelector } from './store/hooks'
-import { fetchProdutos } from './store/slices/produtosSlice'
-import {
-  selectProdutos,
-  selectProdutosLoading,
-  selectFavoritos
-} from './store/selectors'
+import { useAppSelector } from './store/hooks'
+import { useGetProdutosQuery } from './store/api/produtosApi'
 import { adicionarAoCarrinho } from './store/slices/carrinhoSlice'
 import { toggleFavorito } from './store/slices/favoritosSlice'
 import { Produto } from './types'
+import { useAppDispatch } from './store/hooks'
 
 function AppContent() {
   const dispatch = useAppDispatch()
-  const produtos = useAppSelector(selectProdutos)
-  const loading = useAppSelector(selectProdutosLoading)
-  const favoritos = useAppSelector(selectFavoritos)
-
-  useEffect(() => {
-    dispatch(fetchProdutos())
-  }, [dispatch])
+  const { data: produtos = [], isLoading, error } = useGetProdutosQuery()
+  const favoritos = useAppSelector((state) => state.favoritos.itens)
 
   const handleAdicionarAoCarrinho = (produto: Produto) => {
     dispatch(adicionarAoCarrinho(produto))
@@ -34,8 +23,12 @@ function AppContent() {
     dispatch(toggleFavorito(produto))
   }
 
-  if (loading) {
+  if (isLoading) {
     return <div>Carregando...</div>
+  }
+
+  if (error) {
+    return <div>Erro ao carregar produtos</div>
   }
 
   return (
